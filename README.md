@@ -16,13 +16,48 @@ Just select, prompt, and send. Then hope for the best. Each prompt is its own in
 
 ## How to install
 
-I know there are many package managers, so please use any that you know. If I need to make changes to support one, file an issue or PR.
+This plugin uses the standard Neovim plugin layout, so it should work with any plugin manager. Make sure the external `pi` executable is installed and available on Neovim's `$PATH`.
 
-Here's how to do it without a package manager:
+### lazy.nvim / LazyVim
+
+Add a plugin spec like this:
+
+```lua
+-- ~/.config/nvim/lua/plugins/pi-complete.lua
+return {
+  "sacenox/vim-pi-complete",
+  cmd = { "Pi" },
+}
+```
+
+For local development, use `dir` instead:
+
+```lua
+return {
+  dir = "~/src/vim-pi-complete",
+  cmd = { "Pi" },
+}
+```
+
+Note: when lazy-loading with `cmd = { "Pi" }`, the lowercase `:pi` abbreviation is only available after the plugin has loaded. Use `:Pi` to trigger loading, or define the abbreviation in `init`:
+
+```lua
+return {
+  "sacenox/vim-pi-complete",
+  cmd = { "Pi" },
+  init = function()
+    vim.cmd([[cabbrev pi Pi]])
+  end,
+}
+```
+
+### Native packages
+
+Without a plugin manager:
 
 ```bash
 cd ~/.config/nvim/pack/local/start
-git clone <this repo>
+git clone https://github.com/sacenox/vim-pi-complete.git
 ```
 
 Then restart Neovim.
