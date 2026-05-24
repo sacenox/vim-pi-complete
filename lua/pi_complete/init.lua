@@ -20,7 +20,7 @@ local function prompt_for_pi(user_prompt, selected_text)
     -- The actual text selected in Visual mode.
     selected_text,
     -- The "system" prompt
-    'Use the information above to generate the exact replacement of the given text above. Return only the exact replacement text. Do not edit the file directly'
+    'Generate an exact replacement for the selected text using the user prompt and surrounding file context. Return only the replacement text.'
   }, '\n')
 end
 
@@ -51,6 +51,10 @@ function M.complete(user_prompt, has_range)
   local selected_text = vim.fn.getreg('z')
   local selected_type = vim.fn.getregtype('z')
 
+  -- Let the user know Neovim is about to block while pi generates a response.
+  vim.notify('Pi is generating...', vim.log.levels.INFO)
+  vim.cmd('redraw')
+
   -- Call the external `pi` program with a prompt built from the user instruction
   -- and the selected text from Vim's current working directory. The command's
   -- stdout becomes `output`.
@@ -61,8 +65,10 @@ function M.complete(user_prompt, has_range)
     'sh',
     vim.fn.getcwd(),
     'pi',
-    '-tools',
-    'read',
+    '-t',
+    'read,find,ls,grep',
+    '--thinking',
+    'minimal',
     '-p',
     prompt_for_pi(user_prompt, selected_text),
   })
@@ -82,6 +88,10 @@ function M.complete(user_prompt, has_range)
 
   -- Finally, restore register z so this plugin does not clobber the user's data.
   vim.fn.setreg('z', old_z, old_z_type)
+
+  -- Let the user know we are done.
+  vim.notify('Pi is done.', vim.log.levels.INFO)
+  vim.cmd('redraw')
 end
 
 -- Return the module table so Neovim can require() this file and call M.complete().
